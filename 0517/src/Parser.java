@@ -41,181 +41,87 @@ public class Parser {
                           TokenType.LeftParen, TokenType.RightParen};
         for (int i=0; i<header.length; i++)   // bypass "int main ( )"
             match(header[i]);
-
-        System.out.println(match(TokenType.LeftBrace));
-        // student exercise
-        Declarations d = declarations();
-        Block b = statements ();
-        
-        //System.out.println(match(TokenType.RightBrace));
-        return new Program(d, b);  // student exercise
+        match(TokenType.LeftBrace);
+        // student exercise : 1
+        match(TokenType.RightBrace);
+        return null;  // student exercise : 2
     }
   
-    private Declarations declarations () { // sentences
+    private Declarations declarations () {
         // Declarations --> { Declaration }
-    	Declarations ds = new Declarations();
-    	while(isType()) {
-    		declaration(ds);
-    	}
-        return ds;  // student exercise
+        return null;  // student exercise : 3
     }
   
-    private void declaration (Declarations ds) { // one sentence
+    private void declaration (Declarations ds) {
         // Declaration  --> Type Identifier { , Identifier } ;
-    	Declaration d = null;
-    	Type t = type();
-    	d = new Declaration(new Variable(match(TokenType.Identifier)) , t);
-    	ds.add(d);
-    	
-    	while (token.type().equals(TokenType.Comma)) {
-    		Operator op = new Operator(match(token.type()));
-    		Declaration d1 = new Declaration(new Variable(match(TokenType.Identifier)), type());
-    		ds.add(d1);
-    		
-    	}
-    	match(TokenType.Semicolon); // student exercise	
+        // student exercise : 4
     }
   
-    private Type type () {  // seleuchel ok
+    private Type type () {
         // Type  -->  int | bool | float | char 
         Type t = null;
-        if(token.type().equals(TokenType.Int))
-        	t = t.INT;
-        else if (token.type().equals(TokenType.Bool))
-        	t = t.BOOL;
-        else if (token.type().equals(TokenType.Float))
-        	t = t.FLOAT;
-        else if (token.type().equals(TokenType.Char))
-        	t = t.CHAR;
-        else
-        	error("int | bool | float | char "); // student exercise
-        token = lexer.next(); 
+        // student exercise : 5
         return t;          
     }
   
-    private Statement statement() { //hey
+    private Statement statement() {
         // Statement --> ; | Block | Assignment | IfStatement | WhileStatement
-        Statement s = null;
-        if (token.type().equals(TokenType.Semicolon)) {
-        	match(TokenType.Semicolon);
-        	s = new Skip();
-        }else if (token.type().equals(TokenType.LeftBrace)) {
-        	s = statements();        
-    	}else if (token.type().equals(TokenType.Identifier)) {
-        	s = assignment();
-        }else if (token.type().equals(TokenType.If)) {
-        	s = ifStatement();
-        }else if (token.type().equals(TokenType.While)) {
-        	s = whileStatement();
-        }
-        return s; // student exercise
+        Statement s = new Skip();
+        // student exercise : 6
+        return s;
     }
   
     private Block statements () {
         // Block --> '{' Statements '}'
         Block b = new Block();
-        System.out.println(token);
-        if(token.type().equals(TokenType.LeftBrace))
-        	token = lexer.next();
-        System.out.println(token);
-        Statement s = statement();
-        while(s != null) {
-        	System.out.println(token);
-        	b.members.add(s);
-        	s = statement();
-        }
-        System.out.println(token);
-        
-        // last block }
-        if(token.type().equals(TokenType.RightBrace))
-        	token = lexer.next();
-        return b; //student
+        // student exercise : 7
+        return b;
     }
   
-    private Assignment assignment () { // @ no string? hey
+    private Assignment assignment () {
         // Assignment --> Identifier = Expression ;
-    	Variable v = new Variable(match(TokenType.Identifier));
+    	match(TokenType.Identifier);
     	match(TokenType.Assign);
-    	Expression e = expression();
+    	Expression exp = expression();
     	match(TokenType.Semicolon);
-        return new Assignment(v, e);  // student exercise
+    	
+        return Assignment(TokenType.Identifier, exp);  // student exercise : 8
     }
   
     private Conditional ifStatement () {
         // IfStatement --> if ( Expression ) Statement [ else Statement ]
-    	Conditional c = null;
-    	Expression e = null;
-    	if (token.type().equals(TokenType.LeftParen)) {
-    		token = lexer.next(); // not op
-    		e = expression();
-    	}
-    	
-    	if (token.type().equals(TokenType.Else)) {
-    		token = lexer.next();
-    		Statement s = statement();
-    		c = new Conditional(e, c, s);
-    	}
-    	c = new Conditional(e, c);
-        return c;  // student exercise
+        return null;  // student exercise : 9
     }
   
-    private Loop whileStatement () { // seleuchel ok
+    private Loop whileStatement () {
         // WhileStatement --> while ( Expression ) Statement
-    	Expression e = null;
-    	match(TokenType.While);
-    	match(TokenType.LeftParen);
-    	e = expression(); //TokenType.LeftParen
-    	match(TokenType.RightParen);
-
-    	Statement s = statement();
-        return new Loop(e, s);  // student exercise
+        return null;  // student exercise : 10
     }
 
-    private Expression expression () { // seleuchel ok
+    private Expression expression () {
         // Expression --> Conjunction { || Conjunction }
-    	Expression c1 = conjunction();
-    	while(token.type().equals(TokenType.Or)) {
-    		Operator op = new Operator(match(token.type()));
-    		token = lexer.next();
-    		Expression c2 = conjunction();
-    		return new Binary(op, c1 ,c2);
-    	}
-        return c1;  // student exercise
-    }
-  
-    private Expression conjunction () { // seleuchel ok
-        // Conjunction --> Equality { && Equality }
-    	Expression eq1 = equality ();
-    	while(token.type().equals(TokenType.And)) { //?
-    		Operator op = new Operator(match(token.type()));
-    		Expression eq2 = equality();
-    		return new Binary(op, eq1 ,eq2);
-    	}
-        return eq1;  // student exercise
-    }
-  
-    private Expression equality () { //seleuchel ok
-        // Equality --> Relation [ EquOp Relation ]
-    	Expression r1 = relation();
+    	conjunction();
     	
-    	if(isEqualityOp()) {
-    		Operator op = new Operator(match(token.type()));
-    		Expression r2 = relation();
-    		r1 = new Binary(op, r1 ,r2);
+    	while(isOrOp()) {
+    		token = lexer.next();
+    		conjunction();
     	}
-        return r1;  // student exercise
+        return null;  // student exercise : 11
+    }
+  
+    private Expression conjunction () {
+        // Conjunction --> Equality { && Equality }
+        return null;  // student exercise : 12
+    }
+  
+    private Expression equality () {
+        // Equality --> Relation [ EquOp Relation ]
+        return null;  // student exercise : 13
     }
 
-    private Expression relation (){ // seleuchel ok
+    private Expression relation (){
         // Relation --> Addition [RelOp Addition] 
-    	Expression a1 = addition();
-    	
-    	if(isRelationalOp()) {
-    		Operator op = new Operator(match(token.type()));
-    		Expression a2 = addition();
-    		a1 = new Binary(op, a1 ,a2);
-    	}
-        return a1;  // student exercise
+        return null;  // student exercise  : 14
     }
   
     private Expression addition () {
@@ -246,8 +152,8 @@ public class Parser {
             Operator op = new Operator(match(token.type()));
             Expression term = primary();
             return new Unary(op, term);
-        }else
-        	return primary();
+        }
+        else return primary();
     }
   
     private Expression primary () {
@@ -273,24 +179,7 @@ public class Parser {
     }
 
     private Value literal( ) {
-    	
-    	Value v = null;
-    	if (token.type().equals(TokenType.IntLiteral)) {
-    		v = new IntValue();
-    	}else if (token.type().equals(TokenType.FloatLiteral)) {
-    		v = new FloatValue();
-    	}else if (token.type().equals(TokenType.CharLiteral)) {
-    		v = new CharValue();
-    	}else if (token.type().equals(TokenType.True)) {
-    		v = new BoolValue(true);
-    	}else if (token.type().equals(TokenType.False)) {
-    		v = new BoolValue(false);
-    	}else {
-    		error("IntValue | FloatValue | CharValue | BoolValue");
-    	}
-    	token = lexer.next();
-    	
-        return v;  // student exercise
+        return null;  // student exercise : 15
     }
   
 
